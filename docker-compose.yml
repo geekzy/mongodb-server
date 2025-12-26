@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # The Database Service
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -9,15 +8,13 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: passw0rd
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-passw0rd}
     volumes:
-      # Data persistence (Named volume recommended for consistency)
       - mongodb_data:/data/db
     networks:
       - app-network
 
-  # Web-based Admin UI (Optional but recommended for Dev)
   mongo-express:
     image: mongo-express
     container_name: mongo-express
@@ -25,9 +22,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: passw0rd
-      ME_CONFIG_MONGODB_URL: mongodb://root:passw0rd@mongodb:27017/
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME:-root}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-passw0rd}
+      - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/?authSource=admin
     depends_on:
       - mongodb
     networks:

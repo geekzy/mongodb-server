@@ -99,3 +99,31 @@ if err != nil {
     log.Fatal(err)
 }
 ```
+ 
+## 🔐 Environment and pushing
+
+To avoid committing secrets, create a local `.env` from the provided `.env.example` and fill in your values. The `.env` file is ignored by Git.
+
+```bash
+cp .env.example .env
+# then edit .env and fill values (GIT_REMOTE_URL, GIT_USER_NAME, GIT_USER_EMAIL, GITHUB_TOKEN)
+```
+
+- If you want to push to GitHub over SSH, set `GIT_REMOTE_URL` to the SSH URL (e.g. `git@github.com:username/repo.git`).
+- If you prefer HTTPS and use a personal access token, keep the token in `.env` and configure your remote accordingly (do not commit it).
+
+To add a remote and push (replace with your remote URL if you prefer):
+
+```bash
+# Add remote (if not already set)
+git remote add origin "$GIT_REMOTE_URL"
+# Push main branch
+git push -u origin main
+```
+
+Note: If `GIT_USER_NAME` and `GIT_USER_EMAIL` are not set globally, you can apply them locally for this repository:
+
+```bash
+git config user.name "$GIT_USER_NAME"
+git config user.email "$GIT_USER_EMAIL"
+```
