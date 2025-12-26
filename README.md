@@ -42,9 +42,11 @@ The stack is defined in `docker-compose.yml`.
 
 ### Credentials
 
-* **Root Username:** `root`
-* **Root Password:** `passw0rd`
-* **Auth Database:** `admin`
+Credentials are read from environment variables (see `.env.example`):
+
+- **Root Username:** `MONGO_INITDB_ROOT_USERNAME` (default: `root`)
+- **Root Password:** `MONGO_INITDB_ROOT_PASSWORD` (set in your local `.env`)
+- **Auth Database:** `admin`
 
 ### Data Persistence
 
@@ -60,7 +62,9 @@ Data is persisted using a named Docker volume (`mongodb_data`).
 Use this connection string for your local **Golang** or **Node.js** applications:
 
 ```text
-mongodb://root:passw0rd@localhost:27017/?authSource=admin
+mongodb://<username>:<password>@localhost:27017/?authSource=admin
+
+Replace `<username>` and `<password>` with the values from your `.env` file (or use the example in `.env.example`).
 
 ```
 
@@ -69,7 +73,9 @@ mongodb://root:passw0rd@localhost:27017/?authSource=admin
 If your application is running inside another Docker container on the same network (`app-network`), use the service name:
 
 ```text
-mongodb://root:passw0rd@mongodb:27017/?authSource=admin
+mongodb://<username>:<password>@mongodb:27017/?authSource=admin
+
+Replace `<username>` and `<password>` with the values from your `.env` file (or use the example in `.env.example`).
 
 ```
 
@@ -100,30 +106,40 @@ if err != nil {
 }
 ```
  
-## 🔐 Environment and pushing
+## 🔐 Environment
 
-To avoid committing secrets, create a local `.env` from the provided `.env.example` and fill in your values. The `.env` file is ignored by Git.
+Create a local `.env` from `.env.example` and fill in the MongoDB credentials. The `.env` file is ignored by Git.
 
 ```bash
 cp .env.example .env
-# then edit .env and fill values (GIT_REMOTE_URL, GIT_USER_NAME, GIT_USER_EMAIL, GITHUB_TOKEN)
+# then edit .env and set:
+# MONGO_INITDB_ROOT_USERNAME
+# MONGO_INITDB_ROOT_PASSWORD
 ```
 
-- If you want to push to GitHub over SSH, set `GIT_REMOTE_URL` to the SSH URL (e.g. `git@github.com:username/repo.git`).
-- If you prefer HTTPS and use a personal access token, keep the token in `.env` and configure your remote accordingly (do not commit it).
-
-To add a remote and push (replace with your remote URL if you prefer):
+Run the stack using Docker Compose or the provided Makefile:
 
 ```bash
-# Add remote (if not already set)
-git remote add origin "$GIT_REMOTE_URL"
-# Push main branch
-git push -u origin main
+docker compose up -d
+# or
+make up
 ```
 
-Note: If `GIT_USER_NAME` and `GIT_USER_EMAIL` are not set globally, you can apply them locally for this repository:
+Admin UI (mongo-express) will be available at http://localhost:8081 and MongoDB at port 27017.
+
+Connection strings (replace with values from your `.env`):
+
+```text
+mongodb://<username>:<password>@localhost:27017/?authSource=admin
+
+# From inside the Docker network
+mongodb://<username>:<password>@mongodb:27017/?authSource=admin
+```
+
+If you want Docker Compose to render the effective configuration (helpful to verify env substitution):
 
 ```bash
-git config user.name "$GIT_USER_NAME"
-git config user.email "$GIT_USER_EMAIL"
+docker compose config
 ```
+
+If you prefer, remove the `version:` key from `docker-compose.yml` to avoid an informational warning on newer Compose versions.
