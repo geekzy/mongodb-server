@@ -105,7 +105,7 @@ if err != nil {
     log.Fatal(err)
 }
 ```
- 
+
 ## 🔐 Environment
 
 Create a local `.env` from `.env.example` and fill in the MongoDB credentials. The `.env` file is ignored by Git.
